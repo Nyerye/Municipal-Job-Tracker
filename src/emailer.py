@@ -10,7 +10,10 @@ SENDER_EMAIL = os.getenv("SENDER_EMAIL")
 SENDER_PASSWORD = os.getenv("SENDER_PASSWORD")
 RECIPIENT_EMAIL = os.getenv("RECIPIENT_EMAIL")
 
+# Function for controlling the email being sent
 def send_email(jobs):
+
+    # IF you are getting errors in the terminal, you MUST add in your credentials to the .env file and you need to make a Google App Password. See the README for more details.
     if not (SENDER_EMAIL and SENDER_PASSWORD and RECIPIENT_EMAIL):
         print("[ERROR] Missing email config in .env")
         return

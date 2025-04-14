@@ -1,5 +1,6 @@
 # src/main.py
 
+# Main entry point. Imports cusotm and standard libraries for functions
 from job_scraper import scrape_jobs
 from emailer import send_email
 import logging
@@ -11,6 +12,7 @@ def main():
 
         jobs = scrape_jobs()
         
+        # Only if something is found will it print this in the Terminal of choice. 
         if jobs:
             logging.info(f"Found {len(jobs)} job(s). Sending email...")
             send_email(jobs)
