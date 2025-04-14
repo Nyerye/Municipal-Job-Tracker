@@ -53,7 +53,7 @@ A Python-based job monitoring tool that scrapes and filters **IT-related job pos
 git clone https://github.com/yourusername/municipality-job-tracker.git
 cd municipality-job-tracker
 python -m venv venv
-.env\Scriptsctivate       # Windows
+.venv\Scripts\activate       # Windows
 pip install -r requirements.txt
 ```
 
