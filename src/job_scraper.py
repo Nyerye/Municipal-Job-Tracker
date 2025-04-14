@@ -2,11 +2,7 @@
 
 import requests
 from bs4 import BeautifulSoup
-
-KEYWORDS = [
-    "IT", "Systems Analyst", "Embedded Developer", "Programmer",
-    "Analyst", "System Administrator", "Service Desk"
-]
+import re
 
 # Job board URLs for each municipality (where available)
 CITY_URLS = {
@@ -26,8 +22,31 @@ CITY_URLS = {
     "Halton Region": "https://www.halton.ca/The-Region/Careers"
 }
 
-def keyword_match(text):
-    return any(keyword.lower() in text.lower() for keyword in KEYWORDS)
+job_titles = [
+    "IT Support Specialist", "IT Support Technician", "Service Desk Analyst", "Help Desk Analyst",
+    "Desktop Support Technician", "Technical Support Specialist", "End User Support Technician",
+    "IT Operations Analyst", "Systems Analyst", "Business Systems Analyst", "IT Analyst",
+    "Network Analyst", "Network Administrator", "Network Engineer", "Infrastructure Analyst",
+    "Infrastructure Specialist", "System Administrator", "Linux Administrator", "Windows Administrator",
+    "Cloud Administrator", "Cloud Engineer", "Cloud Solutions Architect", "Cybersecurity Analyst",
+    "Security Analyst", "Information Security Analyst", "Security Engineer", "Security Administrator",
+    "DevOps Engineer", "Site Reliability Engineer", "Software Developer", "Software Engineer",
+    "Application Developer", "Web Developer", "Frontend Developer", "Backend Developer",
+    "Full Stack Developer", "Embedded Systems Developer", "Database Administrator", "Data Analyst",
+    "Data Engineer", "Data Scientist", "IT Project Manager", "IT Manager", "IT Coordinator",
+    "IT Consultant", "Solutions Architect", "Enterprise Architect", "QA Analyst",
+    "Test Automation Engineer", "Technical Business Analyst", "IT Compliance Analyst",
+    "Technical Account Manager", "Field Support Technician", "IT Trainer", "IT Asset Manager",
+    "IT Procurement Specialist", "Incident Response Analyst", "Vulnerability Analyst",
+    "Penetration Tester", "SOC Analyst", "IT Auditor", "IT Generalist", "Integration Specialist",
+    "CRM Developer", "ERP Analyst", "IT Systems Engineer", "IT Change Manager", "IT Release Manager",
+    "Application Support Analyst", "IT Monitoring Specialist", "IT Governance Analyst", "Infrastructure Engineer"
+]
+
+pattern = re.compile(r'\b(?:' + '|'.join(map(re.escape, job_titles)) + r')\b', flags=re.IGNORECASE)
+
+def keyword_match(text: str) -> bool:
+    return bool(pattern.search(text))
 
 def scrape_city(city, url):
     jobs = []

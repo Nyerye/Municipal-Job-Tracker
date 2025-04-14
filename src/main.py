@@ -10,6 +10,7 @@ def main():
                             format="%(asctime)s - %(levelname)s - %(message)s")
 
         jobs = scrape_jobs()
+        
         if jobs:
             logging.info(f"Found {len(jobs)} job(s). Sending email...")
             send_email(jobs)
