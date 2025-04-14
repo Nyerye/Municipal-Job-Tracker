@@ -1,10 +1,11 @@
 
-
+# File that holds the coode for parsing the info
 import requests
 from bs4 import BeautifulSoup
 import re
 
 # Job board URLs for each municipality (where available)
+# You can add to this by following the same format as you see for the rest of these
 CITY_URLS = {
     "City of Guelph": "https://guelph.ca/careers/",
     "City of Cambridge": "https://www.cambridge.ca/en/your-city/current-opportunities.aspx",
@@ -22,6 +23,7 @@ CITY_URLS = {
     "Halton Region": "https://www.halton.ca/The-Region/Careers"
 }
 
+# Same rule applies here
 job_titles = [
     "IT Support Specialist", "IT Support Technician", "Service Desk Analyst", "Help Desk Analyst",
     "Desktop Support Technician", "Technical Support Specialist", "End User Support Technician",
@@ -43,11 +45,14 @@ job_titles = [
     "Application Support Analyst", "IT Monitoring Specialist", "IT Governance Analyst", "Infrastructure Engineer"
 ]
 
+# creating a custom regex that will aprse the info. original testing pulled all the pages off the target employers itye which was not what I wanted and created too much network noise. 
 pattern = re.compile(r'\b(?:' + '|'.join(map(re.escape, job_titles)) + r')\b', flags=re.IGNORECASE)
 
+# Function for testing the regex pattern
 def keyword_match(text: str) -> bool:
     return bool(pattern.search(text))
 
+# Function to scrape job postings from a given city URL
 def scrape_city(city, url):
     jobs = []
     try:
@@ -69,6 +74,7 @@ def scrape_city(city, url):
         print(f"[ERROR] Could not scrape {city}: {e}")
     return jobs
 
+# Function to scrape jobs from all cities that you listed above. 
 def scrape_jobs():
     all_jobs = []
     for city, url in CITY_URLS.items():
