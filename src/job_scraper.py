@@ -1,29 +1,18 @@
+# src/job_scraper.py
 
-# File that holds the coode for parsing the info
 import requests
 from bs4 import BeautifulSoup
 import re
+import json
+import os
 
-# Job board URLs for each municipality (where available)
-# You can add to this by following the same format as you see for the rest of these
-CITY_URLS = {
-    "City of Guelph": "https://guelph.ca/careers/",
-    "City of Cambridge": "https://www.cambridge.ca/en/your-city/current-opportunities.aspx",
-    "City of Kitchener": "https://www.kitchener.ca/en/city-services/careers.aspx",
-    "City of Waterloo": "https://www.waterloo.ca/en/government/current-opportunities.aspx",
-    "City of Toronto": "https://jobs.toronto.ca/jobsatcity/",
-    "City of Mississauga": "https://jobs.mississauga.ca/",
-    "Norfolk County": "https://www.norfolkcounty.ca/government/employment-opportunities/",
-    "City of Hamilton": "https://www.hamilton.ca/jobs-city",
-    "City of Brantford": "https://www.brantford.ca/en/living-here/careers.aspx",
-    "City of London": "https://careers.london.ca/",
-    "Wellington County": "https://www.wellington.ca/en/government/employmentopportunities.aspx",
-    "Region of Waterloo": "https://www.regionofwaterloo.ca/en/regional-government/careers.aspx",
-    "City of Burlington": "https://www.burlington.ca/en/your-city/careers.asp",
-    "Halton Region": "https://www.halton.ca/The-Region/Careers"
-}
+__all__ = ["scrape_jobs", "load_employer_urls"]
 
-# Same rule applies here
+# Actual path to data/employers.json for both development and exe
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+EMPLOYER_FILE = os.path.abspath(os.path.join(BASE_DIR, "..", "data", "employers.json"))
+
+# Job title keywords
 job_titles = [
     "IT Support Specialist", "IT Support Technician", "Service Desk Analyst", "Help Desk Analyst",
     "Desktop Support Technician", "Technical Support Specialist", "End User Support Technician",
@@ -45,20 +34,26 @@ job_titles = [
     "Application Support Analyst", "IT Monitoring Specialist", "IT Governance Analyst", "Infrastructure Engineer"
 ]
 
-# creating a custom regex that will aprse the info. original testing pulled all the pages off the target employers itye which was not what I wanted and created too much network noise. 
+# Precompiled regex
 pattern = re.compile(r'\b(?:' + '|'.join(map(re.escape, job_titles)) + r')\b', flags=re.IGNORECASE)
 
-# Function for testing the regex pattern
+
 def keyword_match(text: str) -> bool:
     return bool(pattern.search(text))
 
-# Function to scrape job postings from a given city URL
-def scrape_city(city, url):
+
+def load_employer_urls() -> dict:
+    if os.path.exists(EMPLOYER_FILE):
+        with open(EMPLOYER_FILE, "r") as f:
+            return json.load(f)
+    return {}
+
+
+def scrape_city(city: str, url: str) -> list:
     jobs = []
     try:
         response = requests.get(url, timeout=10)
         soup = BeautifulSoup(response.text, "lxml")
-
         for link in soup.find_all("a"):
             text = link.get_text(strip=True)
             href = link.get("href", "")
@@ -69,16 +64,14 @@ def scrape_city(city, url):
                     "title": text,
                     "url": full_url
                 })
-
     except Exception as e:
         print(f"[ERROR] Could not scrape {city}: {e}")
     return jobs
 
-# Function to scrape jobs from all cities that you listed above. 
-def scrape_jobs():
+
+def scrape_jobs() -> list:
     all_jobs = []
-    for city, url in CITY_URLS.items():
+    for city, url in load_employer_urls().items():
         print(f"Scraping {city}...")
-        city_jobs = scrape_city(city, url)
-        all_jobs.extend(city_jobs)
+        all_jobs.extend(scrape_city(city, url))
     return all_jobs
